@@ -10,7 +10,6 @@ import java.util.*
 class RandomCharacterService : Service() {
     private var isRandomGeneratorOn = false
     private val alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray()
-
     private val TAG = "RandomCharacterService"
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -18,8 +17,13 @@ class RandomCharacterService : Service() {
         Log.i(TAG, "Service started...")
         isRandomGeneratorOn = true
 
+        // Запуск генератора случайных символов в отдельном потоке
         Thread(Runnable {
-            startRandomGenerator()
+            try {
+                startRandomGenerator()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error in random generator: ${e.message}", e)
+            }
         }).start()
 
         return START_STICKY
@@ -32,8 +36,9 @@ class RandomCharacterService : Service() {
                 if (isRandomGeneratorOn) {
                     val randomIdx = Random().nextInt(26)
                     val myRandomCharacter = alphabet[randomIdx]
-                    Log.i(TAG, "Random Character is $myRandomCharacter")
+                    Log.i(TAG, "Random Character: $myRandomCharacter")
 
+                    // Отправка случайного символа через Broadcast
                     val broadcastIntent = Intent().apply {
                         action = "my.custom.action.tag.lab6"
                         putExtra("randomCharacter", myRandomCharacter)
@@ -42,6 +47,8 @@ class RandomCharacterService : Service() {
                 }
             } catch (e: InterruptedException) {
                 Log.i(TAG, "Thread Interrupted.")
+            } catch (e: Exception) {
+                Log.e(TAG, "Unexpected error: ${e.message}", e)
             }
         }
     }
