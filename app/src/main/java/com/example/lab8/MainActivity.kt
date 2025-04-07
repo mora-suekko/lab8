@@ -26,10 +26,14 @@ class MainActivity : AppCompatActivity() {
 
     fun onClick(view: View) {
         when (view.id) {
-            R.id.button_start -> startService(serviceIntent)
+            R.id.button_start -> {
+                startService(serviceIntent)
+                Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show()  // Показать сообщение
+            }
             R.id.button_end -> {
                 stopService(serviceIntent)
                 randomCharacterEditText.setText("")
+                Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show()  // Показать сообщение
             }
         }
     }
