@@ -17,7 +17,6 @@ class RandomCharacterService : Service() {
         Log.i(TAG, "Service started...")
         isRandomGeneratorOn = true
 
-        // Запуск генератора случайных символов в отдельном потоке
         Thread(Runnable {
             try {
                 startRandomGenerator()
@@ -38,7 +37,6 @@ class RandomCharacterService : Service() {
                     val myRandomCharacter = alphabet[randomIdx]
                     Log.i(TAG, "Random Character: $myRandomCharacter")
 
-                    // Отправка случайного символа через Broadcast
                     val broadcastIntent = Intent().apply {
                         action = "my.custom.action.tag.lab6"
                         putExtra("randomCharacter", myRandomCharacter)

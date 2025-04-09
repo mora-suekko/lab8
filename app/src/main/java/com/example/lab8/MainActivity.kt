@@ -1,26 +1,32 @@
 package com.example.lab8
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var randomCharacterEditText: EditText
-    private lateinit var broadcastReceiver: BroadcastReceiver
+    private lateinit var characterTextView: TextView
     private lateinit var serviceIntent: Intent
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val data = intent?.getCharExtra("randomCharacter", '?')
+            characterTextView.text = data.toString()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        randomCharacterEditText = findViewById(R.id.editText_randomCharacter)
-        broadcastReceiver = MyBroadcastReceiver()
+        characterTextView = findViewById(R.id.characterTextView)
         serviceIntent = Intent(applicationContext, RandomCharacterService::class.java)
     }
 
@@ -28,36 +34,25 @@ class MainActivity : AppCompatActivity() {
         when (view.id) {
             R.id.button_start -> {
                 startService(serviceIntent)
-                Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show()  // Показать сообщение
+                Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show()
             }
             R.id.button_end -> {
                 stopService(serviceIntent)
-                randomCharacterEditText.setText("")
-                Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show()  // Показать сообщение
+                characterTextView.text = ""
+                Toast.makeText(this, "Service Stopped", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onStart() {
         super.onStart()
-        val intentFilter = IntentFilter()
-        intentFilter.addAction("my.custom.action.tag.lab6")
-        registerReceiver(broadcastReceiver, intentFilter)
+        val filter = IntentFilter("my.custom.action.tag.lab6")
+        registerReceiver(receiver, filter)
     }
 
     override fun onStop() {
         super.onStop()
-        unregisterReceiver(broadcastReceiver)
-    }
-
-    inner class MyBroadcastReceiver : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            try {
-                val data = intent?.getCharExtra("randomCharacter", '?')
-                randomCharacterEditText.setText(data.toString())
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        unregisterReceiver(receiver)
     }
 }
