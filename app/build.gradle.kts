@@ -9,8 +9,8 @@ android {
 
     defaultConfig {
         applicationId = "com.example.lab8"
-        minSdk = 34
-        targetSdk = 35
+        minSdk = 28
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
 
@@ -26,17 +26,18 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

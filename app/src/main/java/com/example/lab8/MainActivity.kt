@@ -1,15 +1,17 @@
 package com.example.lab8
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import android.content.Context.RECEIVER_NOT_EXPORTED
 
 class MainActivity : AppCompatActivity() {
     private lateinit var characterTextView: TextView
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val data = intent?.getCharExtra("randomCharacter", '?')
+            Log.d("Receiver", "Получен символ: $data")
             characterTextView.text = data.toString()
         }
     }
@@ -27,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         characterTextView = findViewById(R.id.characterTextView)
-        serviceIntent = Intent(applicationContext, RandomCharacterService::class.java)
+        serviceIntent = Intent(this, RandomCharacterService::class.java)
     }
 
     fun onClick(view: View) {
         when (view.id) {
             R.id.button_start -> {
-                startService(serviceIntent)
+                ContextCompat.startForegroundService(this, serviceIntent)
                 Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show()
             }
             R.id.button_end -> {
@@ -44,11 +47,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onStart() {
         super.onStart()
         val filter = IntentFilter("my.custom.action.tag.lab6")
-        registerReceiver(receiver, filter)
+        registerReceiver(receiver, filter, RECEIVER_NOT_EXPORTED)
     }
 
     override fun onStop() {
